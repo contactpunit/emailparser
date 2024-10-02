@@ -8,10 +8,7 @@ This project is about authenticating with gmail using oauth. Once authorization 
 - [Pre-requisites for Usage](#Prerequisites)
 - [Mysql DB Schema](#mysqlSchema)
 - [Usage](#usage)
-- [Features](#features)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
+- [Limitations and Enhancements](#limitations and enhancements)
 
 ## Installation
 
@@ -43,10 +40,26 @@ Make sure mailcreds table is already populated with client_id, client_secret and
 ![Alt text](images/describe.jpg)
 
 As per below image make sure table mailcreds is already updated with required fields.
-On running the script corresponding tokens db as well as mailbox db are updated
+On running the script corresponding tokens db as well as mailbox db are updated.
 
 ![Alt text](images/dbdata.jpg)
 
 1. **Credentials db**: 
 
-This is the location where gail client id and secrets are stored
+## Usage
+
+Once the pre-requisite are met, you can run script as below:
+
+1. Set environmental variable. :
+```bash
+(emailparser) Punits-MacBook-Pro:emailparser punitjain$ export OAUTHPASS='your password for mysqldb'
+
+```
+
+```bash
+(emailparser) Punits-MacBook-Pro:emailparser punitjain$ python emailActions.py --fetchMessages True --fetchnum=1 --username root --save 
+regenerating token
+please go to this url and authorize app https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=fb3.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&scope=https%3A%2F%2Fmail.google.com%2F&state=3GiNUS9QhfgJWH18Z4y58&prompt=consent&access_type=offline
+enter auth code here: <enter the code>
+/Users/punitjain/Documents/Punit/project/emailparser/emailActions.py:112: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+```

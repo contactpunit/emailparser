@@ -232,8 +232,7 @@ def read_save_messages(client_id, allMessages, mail_service, save):
                 print(e)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Script to fetch gmails using oauth Api and perform diferent actions",
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(description="Script to fetch gmails using oauth Api and perform diferent actions")
     option1 = parser.add_argument_group('Option 1: Fetch Messages')
     option1.add_argument('--fetchMessages', type=bool, help='fetch messages rom mailbox')
     option1.add_argument('--fetchnum', type=int, help='number of messages to display')

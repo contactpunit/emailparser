@@ -1,5 +1,6 @@
 import os.path
 import json
+import os
 import mysql.connector
 import base64
 import argparse
@@ -77,7 +78,7 @@ def get_tokens_from_db(username, password):
     connection = cursorObj[1]
     sql = "SELECT access_token, refresh_token, token_uri, client_id, client_secret, scopes, universe_domain, account, expiry FROM tokens ORDER BY id DESC LIMIT " + str(args.fetchnum)
     cursor.execute(sql)
-    result = cursor.fetchone()
+    result = cursor.fetchone()  
     if result:
         cursor.close()
         connection.close()
@@ -141,8 +142,9 @@ def insertOrUpdateTokenRecord(username, password, token, client_id, client_secre
             'expiry': expiry_iso
         }
         columns = ', '.join(f"{key} = %s" for key in update_data.keys())
-        sql = f"UPDATE tokens SET {columns} WHERE id = 1"
+        sql = f"UPDATE tokens SET {columns} WHERE client_id = %s"
         values = list(update_data.values())
+        values.append(client_id)
         cursor.execute(sql, values)
         connection.commit()
 
@@ -174,7 +176,7 @@ def get_token(credObj, username, password):
             credObj = creds
     return credObj
 
-def read_messages(allMessages, mail_service):
+def read_save_messages(client_id, allMessages, mail_service, save):
     messages = allMessages.get('messages', [])
     if not messages:
         print("No new messages.")
@@ -183,24 +185,51 @@ def read_messages(allMessages, mail_service):
             # Get the message from its id
             msgTxt = mail_service.users().messages().get(userId='me', id=msg['id']).execute()
             try:
+                msgDetail = {'subject': '', 'from': '', 'msgId': '', 'body': ''}
                 payload = msgTxt['payload']
                 headers = payload['headers']
-
                 for d in headers:
                     if d['name'] == 'Subject':
-                        subject = d['value']
-                        print(subject)
+                        msgDetail['subject'] = d['value']
                     if d['name'] == 'From':
-                        sender = d['value']
-                        print(sender)
+                        msgDetail['from'] = d['value']
+                    if d['name'] == 'Message-ID':
+                        msgDetail['messageid'] = d['value']
                 parts = payload.get('parts')[0]
                 data = parts['body']['data']
                 data = data.replace("-","+").replace("_","/")
                 decoded_data = base64.b64decode(data)
-                print(decoded_data)
-                print('=============')
-            except:
-                pass
+                msgDetail['body'] = decoded_data
+                if save:
+                    cursorObj = connect_db(args.username, args.password)
+                    cursor = cursorObj[0]
+                    connection = cursorObj[1]
+                    sql = "SELECT messageid FROM mailbox WHERE messageid = %s"
+                    cursor.execute(sql, (msgDetail['messageid'],))
+                    result = cursor.fetchone()
+                    if not result:
+                        insert_data = {
+                            'client_id': client_id,
+                            'folder': 'INBOX',
+                            'subject': msgDetail['subject'],
+                            'messageid': msgDetail['messageid'],
+                            'body': msgDetail['body']
+                        }
+                        columns = ', '.join(insert_data.keys())
+                        placeholders = ', '.join(['%s'] * len(insert_data))
+                        sql = f"INSERT INTO mailbox ({columns}) VALUES ({placeholders})"
+                        values = tuple(str(value) if isinstance(value, list) else value for value in insert_data.values())
+                        cursor.execute(sql, values)
+                        connection.commit()
+                        cursor.close()
+                        connection.close()
+                else:
+                    print(f"Subject: {msgDetail['subject']}")
+                    print(f"From: {msgDetail['from']}")
+                    print(f"Body: {msgDetail['body']}")
+                    print('=============')
+            except Exception as e:
+                print(e)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Script to fetch gmails using oauth Api and perform diferent actions",
@@ -208,18 +237,20 @@ if __name__ == '__main__':
     option1 = parser.add_argument_group('Option 1: Fetch Messages')
     option1.add_argument('--fetchMessages', type=bool, help='fetch messages rom mailbox')
     option1.add_argument('--fetchnum', type=int, help='number of messages to display')
+    option1.add_argument( '-x' , '--save', action='store_true', default=False, help='save message/messages to db')
 
-    option2 = parser.add_argument_group('Option 3: Save Messages')
-    option2.add_argument('--saveMessages', type=bool, help='save messages in db')
-    option2.add_argument('--savenum', type=int, help='number of messages to save in db')
+    option2 = parser.add_argument_group('Option 2: Delete Messages')
+    option2.add_argument('--deleteMessages', type=bool, help='save messages in db')
+    option2.add_argument('--delnum', type=int, help='number of messages to delete')
+    option2.add_argument('--folder', type=str, help='folder name')
 
     parser.add_argument('--username', type=str, required=True, help='db username')
-    parser.add_argument('--password', type=str, required=True, help='db password')
+    parser.add_argument('--password', type=str, default=os.getenv('OAUTHPASS', 'default_password'), help='db password')
 
     args = parser.parse_args()
 
     option1_provided = args.fetchMessages is not None and args.fetchnum is not None
-    option2_provided = args.saveMessages is not None and args.savenum is not None
+    option2_provided = args.deleteMessages is not None and args.delnum is not None
 
     if not (option1_provided or option2_provided):
         parser.error("Either Option 1 or Option 2 must be provided.")
@@ -231,7 +262,7 @@ if __name__ == '__main__':
         parser.error("Both fetchMessages and fetchnum must be provided in Group 1.")
 
     if option2_provided and not all([args.saveMessages is not None, args.savenum is not None]):
-        parser.error("Both saveMessages and savenum must be provided in Group 3.")
+        parser.error("Both deleteMessages and delnum must be provided in Group 2.")
 
     if option1_provided:
         result = get_tokens_from_db(args.username, args.password)
@@ -251,14 +282,13 @@ if __name__ == '__main__':
                 cred = get_token(credObj, args.username, args.password)
                 mail_service = build('gmail', 'v1', credentials=cred)
                 results = mail_service.users().messages().list(userId='me', labelIds=['INBOX'], maxResults=args.fetchnum).execute()
-                read_messages(results, mail_service)
+                read_save_messages(client_id, results, mail_service, args.save)
             else:
                 print('some data missing')
-                
         else:
             credObj = generate_token(args.username, args.password)
-            print(credObj)
 
     if option2_provided:
+        # Any other action to be taken like delete etc ...
         pass
 

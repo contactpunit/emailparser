@@ -37,6 +37,12 @@ Below is db schema required for project setup:
 
 ![Alt text](images/databases.jpg)
 
+
+Make sure mailcreds table is already populated with client_id, client_secret and other required details provided when you register for gmail oauth service.
+
+![Alt text](images/describe.jpg)
+
+
 1. **Credentials db**: 
 
 This is the location where gail client id and secrets are stored

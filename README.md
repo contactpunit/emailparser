@@ -8,7 +8,7 @@ This project is about authenticating with gmail using oauth. Once authorization 
 - [Pre-requisites for Usage](#Prerequisites)
 - [Mysql DB Schema](#mysqlSchema)
 - [Usage](#usage)
-- [Limitations and Enhancements](#limitations and enhancements)
+- [Limitations and Enhancements](#limitations)
 
 ## Installation
 
@@ -55,7 +55,7 @@ Once the pre-requisite are met, you can run script as below:
 (emailparser) Punits-MacBook-Pro:emailparser punitjain$ export OAUTHPASS='your password for mysqldb'
 
 ```
-
+2. Run the script with command below
 ```bash
 (emailparser) Punits-MacBook-Pro:emailparser punitjain$ python emailActions.py --fetchMessages True --fetchnum=1 --username root --save 
 regenerating token
@@ -63,3 +63,8 @@ please go to this url and authorize app https://accounts.google.com/o/oauth2/aut
 enter auth code here: <enter the code>
 /Users/punitjain/Documents/Punit/project/emailparser/emailActions.py:112: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
 ```
+
+### Limitations and Enhancements
+
+1. Still working on adding capabilities to read other folders apart from Inbox.
+2. Adding proper exception handling in progress

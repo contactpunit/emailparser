@@ -42,6 +42,10 @@ Make sure mailcreds table is already populated with client_id, client_secret and
 
 ![Alt text](images/describe.jpg)
 
+As per below image make sure table mailcreds is already updated with required fields.
+On running the script corresponding tokens db as well as mailbox db are updated
+
+![Alt text](images/dbdata.jpg)
 
 1. **Credentials db**: 
 

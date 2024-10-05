@@ -68,3 +68,4 @@ enter auth code here: <enter the code>
 
 1. Still working on adding capabilities to read other folders apart from Inbox.
 2. Adding proper exception handling in progress
+3. Adding test cases

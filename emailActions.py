@@ -36,7 +36,7 @@ class Mailbox:
     def get_message(self, message, save) -> None:
         msgTxt = self.mail_service.users().messages().get(userId='me', id=message['id']).execute()
         try:
-            msgDetail = {'subject': '', 'from': '', 'msgId': '', 'body': '', 'folder': 'INBOX'}
+            msgDetail = {'subject': '', 'from': '', 'messageid': '', 'body': '', 'folder': 'INBOX'}
             payload = msgTxt['payload']
             headers = payload['headers']
             for h in headers:
@@ -55,6 +55,7 @@ class Mailbox:
                 print(f"Subject: {msgDetail['subject']}")
                 print(f"From: {msgDetail['from']}")
                 print(f"Body: {msgDetail['body']}")
+                print(f"Message Id: {msgDetail['messageid']}")
                 print('=============')
             else:
                 self.save_message(msgDetail)

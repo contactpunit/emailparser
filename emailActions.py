@@ -20,7 +20,7 @@ class Mailbox:
     def save_message(self, msgDetail):
         fields = ('messageid',)
         try:
-            result = self.dbObject.get_mailbox_fields(self.table, *fields)
+            result = self.dbObject.get_mailbox_fields(self.table, 'messageid', msgDetail['messageid'], *fields)
             if not result:
                 insert_data = {
                     'client_id': client_id,
@@ -247,12 +247,12 @@ class DbConnect:
         except Exception as e:
             print("Error occurred during get operation:", e)
     
-    def get_mailbox_fields(self, table, *fields):
+    def get_mailbox_fields(self, table, match_field, match_value, *fields):
         cursor = self.connect.get_cursor()
         columns = fields[0] if len(fields) == 1 else ', '.join(fields)
-        sql = f"SELECT {columns} from {table}"
+        sql = f"SELECT {columns} from {table} WHERE {match_field} = %s"
         try:
-            cursor.execute(sql)
+            cursor.execute(sql, (match_value,))
             results = cursor.fetchone()
             return results
         except Exception as e:

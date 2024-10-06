@@ -93,7 +93,7 @@ class Tokens:
                 token_uri=self.token_uri,
                 client_id=self.client_id,
                 client_secret=self.client_secret,
-                scopes=self.scopes,
+                scopes=SCOPES,
                 account='',
                 expiry=self.expiry,
                 universe_domain=self.universe_domain

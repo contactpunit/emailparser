@@ -247,7 +247,7 @@ class DbConnect:
     
     def get_mailbox_fields(self, table, *fields):
         cursor = self.connect.get_cursor()
-        columns = len(fields) == fields[0] if len(fields) == 1 else ', '.join(fields)
+        columns = fields[0] if len(fields) == 1 else ', '.join(fields)
         sql = f"SELECT {columns} from {table}"
         try:
             cursor.execute(sql)

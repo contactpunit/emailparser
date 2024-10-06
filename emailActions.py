@@ -203,6 +203,7 @@ class Tokens:
                     self.cred = cred
         else:
             self.generate_token_and_credsObject()
+
 class MysqlDb:
     _activeInstance = None
 

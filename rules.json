@@ -3,23 +3,35 @@
         {
             "name": "rule1",
             "predicate": "all",
-            "criterias": [
-                {
-                    "from": {
-                        "contains": "test.com"
-                    },
-                    "subject": {
-                        "contains": "test mail"
-                    },
-                    "date recieved": {
-                        "less than": "2"
-                    }
-
+            "criterias": {
+                "from": {
+                    "contains": "test.com"
+                },
+                "subject": {
+                    "contains": "test mail"
+                },
+                "date recieved": {
+                    "less than": "2"
                 }
-            ],
+                },
             "actions": [
                 {"move to": "test"},
                 {"read": true}
+            ]
+        },
+        {
+            "name": "rule2",
+            "predicate": "all",
+            "criterias": {
+                "messageid": {
+                    "contains": "kI9NssTK5X-T95bhiHg5sw"
+                },
+                "subject": {
+                    "contains": "Security"
+                }
+            },
+            "actions": [
+                {"move to": "TEST"}
             ]
         }
     ]

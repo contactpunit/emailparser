@@ -302,12 +302,12 @@ class DbConnect:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Script to fetch gmails using oauth Api and perform diferent actions")
     option1 = parser.add_argument_group('Option 1: Fetch Messages')
-    option1.add_argument('--fetchMessages', type=bool, help='fetch messages rom mailbox')
+    option1.add_argument('--fetchMessages', type=bool, help='fetch messages from mailbox')
     option1.add_argument('--fetchnum', type=int, help='number of messages to display')
     option1.add_argument( '-x' , '--save', action='store_true', default=False, help='save message/messages to db')
 
     option2 = parser.add_argument_group('Option 2: Delete Messages')
-    option2.add_argument('--deleteMessages', type=bool, help='save messages in db')
+    option2.add_argument('--deleteMessages', type=bool, help='delete messages from mailbox')
     option2.add_argument('--delnum', type=int, help='number of messages to delete')
     option2.add_argument('--folder', type=str, help='folder name')
 
